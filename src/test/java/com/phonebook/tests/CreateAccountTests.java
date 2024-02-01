@@ -1,51 +1,36 @@
 package com.phonebook.tests;
 
-import java.time.Duration;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.phonebook.models.User;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class CreateAccountTests extends TestBase{
-//precondition: user should be log out
-  //if login link not present
-  //click on the login link
-@BeforeMethod
-  public void ensurePrecondition() {
-  if (!isElementPresent(By.cssSelector("[href='/login']"))){
-    driver.findElement(By.xpath("//button[.='Sign Out']")).click();
-  }
-}
-@Test
-  public void registerExistedUserNegativeTest() {
-  driver.findElement(By.cssSelector("[href='/login']")).click();
-  driver.findElement(By.name("email")).click();
-  driver.findElement(By.name("email")).clear();
-  driver.findElement(By.name("email")).sendKeys("lora@gm.com");
+public class CreateAccountTests extends TestBase {
 
-  driver.findElement(By.name("password")).click();
-  driver.findElement(By.name("password")).clear();
-  driver.findElement(By.name("password")).sendKeys("Lora1254$");
 
-driver.findElement(By.name("registration")).click();
-  Assert.assertTrue(isAlertAppears());
-
-}
-  public boolean isAlertAppears() {
-    Alert alert = new WebDriverWait(driver, Duration.ofSeconds(20))
-        .until(ExpectedConditions.alertIsPresent());
-    if (alert==null) {
-      return false;
-    }else {
-      return true;
+  @BeforeMethod
+  public void ensurePrecondition() {// проверяется, присутствует ли ссылка на вход.
+    if (!app.getUser().isLoginLinkPresent()) {
+      app.getUser().clickOnSignOutButton();
     }
   }
 
-  //enter email
-  //enter password
-  //click on the Registration button
-  //assert: Sign out button is present
+  @Test
+  public void registerExistedUserNegativeTest() {
+
+    app.getUser().clickOnLoginLink();//  // Переходим на страницу входа
+    // Заполняем форму регистрации данными существующего пользователя
+    app.getUser().fillLoginRegisterForm(new User()
+        .setEmail("lora@gm.com")
+      .setPassword( "Lora1254$"));
+
+    app.getUser().clickOnRegisterButton();
+
+    Assert.assertTrue(app.getUser().isAlertAppears());
+  }
+
 }
+//Этот класс представляет собой тестирование регистрации существующего пользователя
+// с отрицательным сценарием, ожидая, что при попытке регистрации с уже существующими
+// данными появится предупреждение.
